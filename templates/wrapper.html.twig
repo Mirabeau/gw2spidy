@@ -28,6 +28,7 @@
     <meta name="keywords" content="Guild Wars 2, Trading Post, Graphs, Charts, Spider, Snapshot" />
     <meta name="author" content="Ruben de Vries / Drakie / rubensayshi" />
     <meta name="robots" content="index,nofollow" />
+    <link rel="icon" href="/assets/img/favicon.ico" sizes="16x16 32x32 48x48 64x64" type="image/vnd.microsoft.icon" />
     <link rel="image_src" href="/assets/img/preview.png" />
 </head>
 <body>
@@ -35,7 +36,12 @@
         <div class="navbar">
             <div class="navbar-inner">
                 <div class="container">
-                    <a class="brand" href="/">{% block navtitle %}Guild Wars 2 Spidy{% endblock %}</a>
+                    <a class="brand" href="/" style="position: relative; padding-left: 70px;">
+                        <div style="position: absolute; top: 3px; left: 3px;">
+                            <img src="/assets/img/favicon_sylvari/favicon64.png" />
+                        </div>
+                        {% block navtitle %}Guild Wars 2 Spidy{% endblock %}
+                    </a>
                     <ul class="nav">
                         <li class="divider-vertical"></li>
                         <li {% if app.isHomeActive %}class="active"{% endif %}>
