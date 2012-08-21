@@ -32,7 +32,7 @@
     <link rel="image_src" href="/assets/img/preview.png" />
 </head>
 <body>
-    <div class="container-fluid ">
+    <div class="container-fluid">
         <div class="navbar">
             <div class="navbar-inner">
                 <div class="container">
@@ -73,7 +73,7 @@
                 </div>
             </div>
         </div>
-        <div class="row-fluid content-row">
+        <div class="row-fluid content-row" id="content_wrapper">
             {% block content_body %}{% endblock %}
         </div>
         <div class="row-fluid content-row" id="content"></div>
@@ -95,9 +95,16 @@
                     type:     'get',
                     dataType: 'html',
                     success: function(data) {
-                        var dom   = $(data);
-                        var html  = dom.filter('.ajax_body').html();
-                        $('#content').html(html);
+                        $(data).each(function(k, src) {
+                            var $src  = $(src),
+                                $dest = $src.attr('id') ? $("#" + $src.attr('id')) : null;
+
+                            if (!$src || !$dest) {
+                                return;
+                            }
+
+                            $dest.html($src.html());
+                        });
                     }
                 });
             }
