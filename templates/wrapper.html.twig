@@ -10,6 +10,7 @@
     <script language="javascript" type="text/javascript" src="/assets/js/vendor/flot/jquery.flot.navigate.min.js"></script>
     <script language="javascript" type="text/javascript" src="/assets/js/vendor/flot/jquery.flot.selection.min.js"></script>
     <script language="javascript" type="text/javascript" src="/assets/js/vendor/flot/jquery.flot.tooltip.min.js"></script>
+    <script language="javascript" type="text/javascript" src="/assets/js/vendor/jquery.pjax.js"></script>
 
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-transition.js"></script>
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-alert.js"></script>
@@ -43,7 +44,7 @@
                         </li>
                         <li class="divider-vertical"></li>
                         <li class="dropdown {% if app.isBrowseActive %}active{% endif %}">
-                            <a data-toggle="dropdown" class="dropdown-toggle" href="/types" data-target="#">Browse <b class="caret"></b></a>
+                            <a data-toggle="dropdown" class="dropdown-toggle noclick" href="/types" data-target="#">Browse <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 {% for type in app.displayTypes %}
                                     {% if type.title %}
@@ -75,6 +76,7 @@
         <div class="row-fluid content-row">
             {% block content_body %}{% endblock %}
         </div>
+        <div class="row-fluid content-row" id="content"></div>
         <div class="row-fluid footer-row navbar">
             <div class="navbar-inner">
                 <span class="pull-right">
@@ -86,12 +88,38 @@
     </div>
 
     <script type="text/javascript">
+        $(function(){
+            var replacePage = function(url) {
+                $.ajax({
+                    url:      url,
+                    type:     'get',
+                    dataType: 'html',
+                    success: function(data) {
+                        var dom   = $(data);
+                        var html  = dom.filter('.ajax_body').html();
+                        $('#content').html(html);
+                    }
+                });
+            }
+
+            $('.nav a:not(.noclick)').on('click', function(e) {
+                history.pushState(null, null, this.href);
+                replacePage(this.href);
+                e.preventDefault();
+            });
+
+            $(window).bind('popstate', function() {
+                replacePage(location.pathname);
+            });
+        });
+
         /*
          * set a random wallpaper (from the guildwars website)
          *  there's a semi-transparent div over it with default 0.8 opacity,
          *  the 2nd value for each entry can be an altered opacity
          */
         $(window).ready(function() {
+
             // IE8 and older won't support RGBA so the background makes a mess ...
             if ($.browser.msie && $.browser.version <= 8) {
                 return;

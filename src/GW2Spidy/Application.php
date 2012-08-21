@@ -10,6 +10,8 @@ class Application extends \Silex\Application {
     protected $homeActive = false;
     protected $displayTypes = null;
 
+    protected $isAjax = false;
+
     protected static $instance;
 
     /**
@@ -39,6 +41,16 @@ class Application extends \Silex\Application {
 
     public function isMemcachedEnabled() {
         return !defined('MEMCACHED_DISABLED') || !MEMCACHED_DISABLED;
+    }
+
+    public function setIsAjax($isAjax = true) {
+        $this->isAjax = $isAjax;
+
+        return $this;
+    }
+
+    public function isAjax() {
+        return $this->isAjax;
     }
 
     public function enableSQLLogging() {

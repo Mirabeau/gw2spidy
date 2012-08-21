@@ -55,6 +55,12 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
     ),
 ));
 
+$app->before(function (Request $request) use ($app) {
+    if ($request->headers->get('X-Requested-With') == 'XMLHttpRequest') {
+        $app->setIsAjax();
+    }
+});
+
 /**
  * ----------------------
  *  route /
