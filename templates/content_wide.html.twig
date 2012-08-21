@@ -1,4 +1,4 @@
-{% extends "wrapper.html.twig" %}
+{% extends app.isAjax ? "ajax_wrapper.html.twig" : "wrapper.html.twig" %}
 
 {% block content_body %}
     <div class="span1"></div>

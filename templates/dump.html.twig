@@ -1,4 +1,4 @@
-{% extends "content_wide.html.twig" %}
+{% extends app.isAjax ? "ajax.html.twig" : "content_sidebar.html.twig" %}
 
 {% block content %}
 <pre>{{ dump }}</pre>
