@@ -10,11 +10,10 @@
     <script language="javascript" type="text/javascript" src="/assets/js/vendor/flot/jquery.flot.navigate.min.js"></script>
     <script language="javascript" type="text/javascript" src="/assets/js/vendor/flot/jquery.flot.selection.min.js"></script>
     <script language="javascript" type="text/javascript" src="/assets/js/vendor/flot/jquery.flot.tooltip.min.js"></script>
-    <script language="javascript" type="text/javascript" src="/assets/js/vendor/jquery.pjax.js"></script>
 
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-transition.js"></script>
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-alert.js"></script>
-    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-dropdown.js"></script>
+    <script src="/assets/js/vendor/bootstrap-dropdown.js"></script>
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tooltip.js"></script>
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tab.js"></script>
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-button.js"></script>
@@ -39,32 +38,6 @@
                     <a class="brand" href="/">{% block navtitle %}Guild Wars 2 Spidy{% endblock %}</a>
                     <ul class="nav">
                         <li class="divider-vertical"></li>
-                        <li {% if app.isHomeActive %}class="active"{% endif %}>
-                            <a href="/">Home</a>
-                        </li>
-                        <li class="divider-vertical"></li>
-                        <li class="dropdown {% if app.isBrowseActive %}active{% endif %}">
-                            <a data-toggle="dropdown" class="dropdown-toggle noclick" href="/types" data-target="#">Browse <b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                {% for type in app.displayTypes %}
-                                    {% if type.title %}
-                                        <li class="dropdown">
-                                            <a href="/type/{{ type.id }}">{{ type }} {% if not type.displaySubTypes.isEmpty %}<i class="icon-arrow-right"></i>{% endif %}</a>
-                                            {% if not type.displaySubTypes.isEmpty %}
-                                                <ul class="dropdown-menu sub-menu">
-                                                    {% for subtype in type.displaySubTypes %}
-                                                        {% if subtype.title %}
-                                                        <li><a href="/type/{{ type.id }}/{{ subtype.id }}">{{ subtype }}</a></li>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </ul>
-                                            {% endif %}
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </li>
-                        <li class="divider-vertical"></li>
                         <form class="navbar-search" action="/search" method="POST">
                             <input type="text" name="search" class="search-query span2" placeholder="Search">
                         </form>
@@ -73,8 +46,42 @@
                 </div>
             </div>
         </div>
-        <div class="row-fluid content-row" id="content_wrapper">
-            {% block content_body %}{% endblock %}
+        <div class="row-fluid content-row">
+            <div id="content" class="span12">
+                <ul class="nav nav-tabs" id="tablist">
+                    <li><a href="/">Home</a></li>
+                    <li id="browse-tab" class="dropdown">
+                        <a data-toggle="dropdown" class="dropdown-toggle noclick" href="/types" data-target="#">Browse <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            {% for type in app.displayTypes %}
+                                {% if type.title %}
+                                    <li class="dropdown">
+                                        <a href="/type/{{ type.id }}">{{ type }} {% if not type.displaySubTypes.isEmpty %}<i class="icon-arrow-right"></i>{% endif %}</a>
+                                        {% if not type.displaySubTypes.isEmpty %}
+                                            <ul class="dropdown-menu sub-menu">
+                                                {% for subtype in type.displaySubTypes %}
+                                                    {% if subtype.title %}
+                                                    <li><a href="/type/{{ type.id }}/{{ subtype.id }}">{{ subtype }}</a></li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li><a href="/item/1140">Copper Ore</a></li>
+                </ul>
+                <div class="tab-content" id="tablist-content">
+                    <div class="tab-pane active" id="home-pane">
+                        {% block content %}{% endblock %}
+                    </div>
+                    <div class="tab-pane" id="browse-pane">browse</div>
+                    <div class="tab-pane" id="item-1140-pane">copper ore</div>
+                </div>
+                <div class="footer-spacer"></div>
+            </div>
         </div>
         <div class="row-fluid content-row" id="content"></div>
         <div class="row-fluid footer-row navbar">
@@ -88,26 +95,81 @@
     </div>
 
     <script type="text/javascript">
-        $(function(){
-            var replacePage = function(url) {
+        var app = $(function() {
+            var bindItemList = function($list) {
+
+            };
+
+            var bindPager = function($pager) {
+                $('a', $pager).on('click', function(e) {
+                    replacePage(this.href, "content", "browse-pane");
+                    // history.pushState(null, null, this.href);
+
+                    e.preventDefault();
+                });
+            };
+
+            var doReplace = function($src, $dest) {
+                console.log($src);
+                console.log($dest);
+                if (!$src || !$dest) {
+                    return;
+                }
+
+                $dest.html($src.html());
+
+                if ($('.pagination', $dest)) {
+                    bindPager($('.pagination', $dest));
+                }
+
+                if ($('.item-list-table', $dest)) {
+                    bindItemList($('.item-list-table', $dest));
+                }
+            };
+
+            var replacePage = function(url, src, dest) {
                 $.ajax({
                     url:      url,
                     type:     'get',
                     dataType: 'html',
                     success: function(data) {
-                        $(data).each(function(k, src) {
-                            var $src  = $(src),
-                                $dest = $src.attr('id') ? $("#" + $src.attr('id')) : null;
+                        var $data = $(data);
+                        console.log(dest);
 
-                            if (!$src || !$dest) {
+                        $data.each(function(k, el) {
+                            if (src && $(el).attr('id') != src) {
                                 return;
                             }
 
-                            $dest.html($src.html());
+                            var $dest = $("#" + (dest ? dest : $(el).attr('id')));
+
+                            console.log($dest);
+                            doReplace($(el), $dest);
                         });
                     }
                 });
-            }
+            };
+
+            $("#tablist #browse-tab li > a").on('click', function(e) {
+                var $this = $(this);
+                $.clearMenus();
+
+                $("#browse-tab > a").tab('show');
+                $("#tablist-content > .tab-pane").hide();
+                $("#browse-pane").show();
+
+                replacePage(this.href, "content", "browse-pane");
+                // history.pushState(null, null, this.href);
+
+                e.preventDefault();
+            });
+
+            return {
+                bindItemList : bindItemList,
+                bindPager    : bindPager
+            };
+
+            return false;
 
             $('.nav a:not(.noclick)').on('click', function(e) {
                 history.pushState(null, null, this.href);
