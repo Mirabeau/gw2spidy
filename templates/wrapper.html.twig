@@ -71,14 +71,12 @@
                             {% endfor %}
                         </ul>
                     </li>
-                    <li><a href="/item/1140">Copper Ore</a></li>
                 </ul>
                 <div class="tab-content" id="tablist-content">
                     <div class="tab-pane active" id="home-pane">
                         {% block content %}{% endblock %}
                     </div>
                     <div class="tab-pane" id="browse-pane">browse</div>
-                    <div class="tab-pane" id="item-1140-pane">copper ore</div>
                 </div>
                 <div class="footer-spacer"></div>
             </div>
@@ -97,7 +95,38 @@
     <script type="text/javascript">
         var app = $(function() {
             var bindItemList = function($list) {
+                $list.on('click.item', function(e) {
+                    var $this    = $(e.target),
+                        $tr      = $this.closest('tr'),
+                        itemId   = $tr.data('item-id'),
+                        itemName = $tr.data('item-name');
 
+                    if (!itemId || !itemName) {
+                        return;
+                    }
+
+                    var $tab = $('<a data-target="#" />')
+                                .attr('href', $this.attr('href'))
+                                .html(itemName)
+                                .appendTo($('<li />').appendTo($('#tablist')));
+
+                    var paneId = 'item-' + itemId + '-pane',
+                        $pane  = $('<div class="tab-pane" />')
+                                    .attr('id', paneId)
+                                    .appendTo($("#tablist-content"));
+
+                    replacePage($this.attr('href'), "content", paneId, function() {
+                        console.log('HRRR');
+                        $tab.tab('show');
+                        $("#tablist-content > .tab-pane").hide();
+                        $pane.show();
+
+                        console.log($pane);
+                    });
+
+
+                    e.preventDefault();
+                });
             };
 
             var bindPager = function($pager) {
@@ -110,8 +139,6 @@
             };
 
             var doReplace = function($src, $dest) {
-                console.log($src);
-                console.log($dest);
                 if (!$src || !$dest) {
                     return;
                 }
@@ -127,25 +154,28 @@
                 }
             };
 
-            var replacePage = function(url, src, dest) {
+            var replacePage = function(url, src, dest, callback) {
                 $.ajax({
                     url:      url,
                     type:     'get',
                     dataType: 'html',
                     success: function(data) {
                         var $data = $(data);
-                        console.log(dest);
 
                         $data.each(function(k, el) {
+                            console.log(el);
                             if (src && $(el).attr('id') != src) {
                                 return;
                             }
 
                             var $dest = $("#" + (dest ? dest : $(el).attr('id')));
 
-                            console.log($dest);
                             doReplace($(el), $dest);
                         });
+
+                        if (typeof callback == 'function') {
+                            callback();
+                        }
                     }
                 });
             };

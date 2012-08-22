@@ -21,7 +21,7 @@
         <th class="type">Type</th>
     </thead>
     {% for item in items %}
-        <tr class="item">
+        <tr class="item" data-item-id="{{ item.dataId }}" data-item-name="{{ item.name }}">
             <td>
                 <a href="/item/{{ item.dataId }}" class="name {{ item.rarityCssClass }}">
                     <img class="image" src="{{ item.img }}" /> {{ item.name }}

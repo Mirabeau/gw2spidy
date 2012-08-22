@@ -1,4 +1,4 @@
-{% extends not included is defined and not app.isAjax ? "wrapper.html.twig" : "empty_shell.html.twig" %}
+{% extends not included is defined ? app.isAjax ? "ajax.html.twig" : "wrapper.html.twig" : "empty_shell.html.twig" %}
 
 {% block content %}
 {% include "item_snippet.html.twig" with {'item': item, 'tag': 'div'} %}
