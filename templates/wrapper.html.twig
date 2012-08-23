@@ -18,6 +18,9 @@
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tab.js"></script>
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-button.js"></script>
 
+    <script src="/assets/js/gw2spidy.js"></script>
+    <script src="/assets/js/chart.js"></script>
+
     <link href="/assets/css/bootstrap.css" rel="stylesheet" />
     <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet" />
     <link href="/assets/css/style.css" rel="stylesheet" />
@@ -93,125 +96,6 @@
     </div>
 
     <script type="text/javascript">
-        var app = $(function() {
-            var bindItemList = function($list) {
-                $list.on('click.item', function(e) {
-                    var $this    = $(e.target),
-                        $tr      = $this.closest('tr'),
-                        itemId   = $tr.data('item-id'),
-                        itemName = $tr.data('item-name');
-
-                    if (!itemId || !itemName) {
-                        return;
-                    }
-
-                    var $tab = $('<a data-target="#" />')
-                                .attr('href', $this.attr('href'))
-                                .html(itemName)
-                                .appendTo($('<li />').appendTo($('#tablist')));
-
-                    var paneId = 'item-' + itemId + '-pane',
-                        $pane  = $('<div class="tab-pane" />')
-                                    .attr('id', paneId)
-                                    .appendTo($("#tablist-content"));
-
-                    replacePage($this.attr('href'), "content", paneId, function() {
-                        console.log('HRRR');
-                        $tab.tab('show');
-                        $("#tablist-content > .tab-pane").hide();
-                        $pane.show();
-
-                        console.log($pane);
-                    });
-
-
-                    e.preventDefault();
-                });
-            };
-
-            var bindPager = function($pager) {
-                $('a', $pager).on('click', function(e) {
-                    replacePage(this.href, "content", "browse-pane");
-                    // history.pushState(null, null, this.href);
-
-                    e.preventDefault();
-                });
-            };
-
-            var doReplace = function($src, $dest) {
-                if (!$src || !$dest) {
-                    return;
-                }
-
-                $dest.html($src.html());
-
-                if ($('.pagination', $dest)) {
-                    bindPager($('.pagination', $dest));
-                }
-
-                if ($('.item-list-table', $dest)) {
-                    bindItemList($('.item-list-table', $dest));
-                }
-            };
-
-            var replacePage = function(url, src, dest, callback) {
-                $.ajax({
-                    url:      url,
-                    type:     'get',
-                    dataType: 'html',
-                    success: function(data) {
-                        var $data = $(data);
-
-                        $data.each(function(k, el) {
-                            console.log(el);
-                            if (src && $(el).attr('id') != src) {
-                                return;
-                            }
-
-                            var $dest = $("#" + (dest ? dest : $(el).attr('id')));
-
-                            doReplace($(el), $dest);
-                        });
-
-                        if (typeof callback == 'function') {
-                            callback();
-                        }
-                    }
-                });
-            };
-
-            $("#tablist #browse-tab li > a").on('click', function(e) {
-                var $this = $(this);
-                $.clearMenus();
-
-                $("#browse-tab > a").tab('show');
-                $("#tablist-content > .tab-pane").hide();
-                $("#browse-pane").show();
-
-                replacePage(this.href, "content", "browse-pane");
-                // history.pushState(null, null, this.href);
-
-                e.preventDefault();
-            });
-
-            return {
-                bindItemList : bindItemList,
-                bindPager    : bindPager
-            };
-
-            return false;
-
-            $('.nav a:not(.noclick)').on('click', function(e) {
-                history.pushState(null, null, this.href);
-                replacePage(this.href);
-                e.preventDefault();
-            });
-
-            $(window).bind('popstate', function() {
-                replacePage(location.pathname);
-            });
-        });
-
         /*
          * set a random wallpaper (from the guildwars website)
          *  there's a semi-transparent div over it with default 0.8 opacity,
