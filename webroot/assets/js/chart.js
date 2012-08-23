@@ -84,8 +84,7 @@ var initchart_navzoom = function(chartdata, callback) {
         var first = chartdata[0]['data'][0][0];
 
         renderoptions.xaxis = {};
-        // renderoptions.xaxis.zoomRange = [first, null];
-        renderoptions.xaxis.panRange  = [first, null];
+        renderoptions.xaxis.panRange = [first, null];
 
         plot = $.plot(placeholder, chartdata, $.extend(true, {}, options, renderoptions, extraoptions));
 
@@ -128,11 +127,6 @@ var initchart_selectzoom = function(chartdata, callback) {
     var render = function(extraoptions) {
         var extraoptions  = extraoptions || {};
         var renderoptions = {};
-        var first = chartdata[0]['data'][0][0];
-
-        renderoptions.xaxis = {};
-        // renderoptions.xaxis.zoomRange = [first, null];
-        renderoptions.xaxis.panRange  = [first, null];
 
         plot = $.plot(placeholder, chartdata, $.extend(true, {}, options, renderoptions, extraoptions));
 

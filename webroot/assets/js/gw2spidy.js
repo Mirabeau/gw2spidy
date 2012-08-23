@@ -30,9 +30,20 @@ var gw2spidy = (function() {
                 return;
             }
 
+            var tabshow = function() {
+                $tab.tab('show');
+                $("#tablist-content > .tab-pane").hide();
+                $pane.show();
+            };
+
             var $tab = $('<a data-target="#" />')
                         .attr('href', $this.attr('href'))
                         .html(itemName)
+                        .on('click', function(e) {
+                            tabshow();
+
+                            e.preventDefault();
+                        })
                         .appendTo($('<li />').appendTo($('#tablist')));
 
             var paneId = 'item-' + itemId + '-pane',
@@ -41,9 +52,7 @@ var gw2spidy = (function() {
                             .appendTo($("#tablist-content"));
 
             replacePage($this.attr('href'), "content", paneId, function() {
-                $tab.tab('show');
-                $("#tablist-content > .tab-pane").hide();
-                $pane.show();
+                tabshow();
 
                 fetchchart("/chart/" + itemId);
                 bindZoomModeButtons("/chart/" + itemId);
